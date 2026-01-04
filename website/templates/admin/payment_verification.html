@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Verification{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem 0;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: var(--text-3xl); font-weight: 700; color: var(--gray-900); margin: 0;">
+                <i class="fas fa-credit-card" style="color: var(--primary); margin-right: 0.5rem;"></i>Payment
+                Verification
+            </h1>
+            <p style="color: var(--gray-500); margin-top: 0.5rem; font-size: var(--text-sm);">
+                Review and approve user payments to grant dashboard access
+            </p>
+        </div>
+    </div>
+
+    <!-- Pending Payments Tab -->
+    <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: var(--text-xl); font-weight: 700; color: var(--gray-900); margin-bottom: 1.5rem;">
+            <i class="fas fa-clock" style="color: #FF9800; margin-right: 0.5rem;"></i>Pending Payments
+        </h2>
+
+        {% if pending_users %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+            {% for user in pending_users %}
+            <div
+                style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: 1.5rem; border-left: 4px solid #FF9800;">
+                <!-- User Info -->
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div
+                        style="width: 50px; height: 50px; background: var(--accent-light-blue); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: var(--text-lg);">
+                        {{ user.first_name[0].upper() if user.first_name else 'U' }}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--gray-900);">{{ user.first_name }}</div>
+                        <div style="font-size: var(--text-sm); color: var(--gray-500);">ID: #{{ user.id }}</div>
+                    </div>
+                </div>
+
+                <!-- User Details -->
+                <div
+                    style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem; font-size: var(--text-sm);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span style="color: var(--gray-600);">Email:</span>
+                        <span style="color: var(--gray-900); font-weight: 500;">{{ user.email }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span style="color: var(--gray-600);">Username:</span>
+                        <span style="color: var(--gray-900); font-weight: 500;">{{ user.username }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <span style="color: var(--gray-600);">Status:</span>
+                        <span
+                            style="display: inline-block; padding: 0.25rem 0.5rem; background: #FFF3E0; color: #E65100; border-radius: var(--radius-md); font-weight: 600; font-size: var(--text-xs);">
+                            <i class="fas fa-clock" style="margin-right: 0.3rem;"></i>Pending
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--gray-600);">Submitted:</span>
+                        <span style="color: var(--gray-900); font-weight: 500;">
+                            {% if user.payment_date %}
+                            {{ user.payment_date.strftime('%b %d, %Y') }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 0.75rem;">
+                    <form method="POST" style="flex: 1;">
+                        <button formaction="{{ url_for('admin.verify_payment', user_id=user.id) }}"
+                            style="width: 100%; padding: 0.75rem; background: var(--accent-green); color: white; border: none; border-radius: var(--radius-lg); font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                            onmouseover="this.style.background='#2a9a3a'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                            onmouseout="this.style.background='var(--accent-green)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                            title="Approve payment and grant dashboard access">
+                            <i class="fas fa-check" style="margin-right: 0.5rem;"></i>Verify Payment
+                        </button>
+                    </form>
+                    <form method="POST" style="flex: 1;">
+                        <button formaction="{{ url_for('admin.reject_payment', user_id=user.id) }}"
+                            style="width: 100%; padding: 0.75rem; background: var(--accent-red); color: white; border: none; border-radius: var(--radius-lg); font-size: var(--text-sm); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                            onmouseover="this.style.background='#c82333'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                            onmouseout="this.style.background='var(--accent-red)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                            title="Reject payment"
+                            onclick="return confirm('Reject payment for {{ user.first_name }}?')">
+                            <i class="fas fa-times" style="margin-right: 0.5rem;"></i>Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div
+            style="background: white; border-radius: var(--radius-xl); padding: 3rem; text-align: center; box-shadow: var(--shadow-md);">
+            <div style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <p style="color: var(--gray-500); font-size: var(--text-lg);">No pending payments</p>
+            <p style="color: var(--gray-400); font-size: var(--text-sm);">All users have been verified or rejected</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Verified Payments Tab -->
+    <div>
+        <h2 style="font-size: var(--text-xl); font-weight: 700; color: var(--gray-900); margin-bottom: 1.5rem;">
+            <i class="fas fa-check-circle" style="color: var(--accent-green); margin-right: 0.5rem;"></i>Verified Users
+        </h2>
+
+        {% if verified_users %}
+        <div
+            style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--gray-50); border-bottom: 2px solid var(--gray-200);">
+                            <th
+                                style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                                User
+                            </th>
+                            <th
+                                style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                                Email
+                            </th>
+                            <th
+                                style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                                Username
+                            </th>
+                            <th
+                                style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                                Verified Date
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in verified_users %}
+                        <tr style="border-bottom: 1px solid var(--gray-200); transition: var(--transition-base); background: white;"
+                            onmouseover="this.style.background='var(--gray-50)'"
+                            onmouseout="this.style.background='white'">
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div
+                                        style="width: 40px; height: 40px; background: var(--accent-light-blue); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--primary);">
+                                        {{ user.first_name[0].upper() if user.first_name else 'U' }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--gray-900);">{{ user.first_name }}
+                                        </div>
+                                        <div style="font-size: var(--text-xs); color: var(--gray-500);">ID: #{{ user.id
+                                            }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray-600); font-size: var(--text-sm);">
+                                {{ user.email }}
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray-600); font-size: var(--text-sm);">
+                                {{ user.username }}
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray-600); font-size: var(--text-sm);">
+                                {% if user.payment_date %}
+                                {{ user.payment_date.strftime('%b %d, %Y') }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div
+            style="background: white; border-radius: var(--radius-xl); padding: 3rem; text-align: center; box-shadow: var(--shadow-md);">
+            <div style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;">
+                <i class="fas fa-users"></i>
+            </div>
+            <p style="color: var(--gray-500); font-size: var(--text-lg);">No verified users yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

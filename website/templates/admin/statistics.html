@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}System Statistics{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 20px;">
+    <h2>System Statistics</h2>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>{{ verified_users }}</h3>
+                <p>Verified Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>{{ total_referrals }}</h3>
+                <p>Total Referrals</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>{{ total_earnings }}</h3>
+                <p>Total Points Distributed</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-md-6">
+            <div class="card" style="padding: 20px;">
+                <h4>Cashout Statistics</h4>
+                <p><strong>Pending Payouts:</strong> GH₵{{ "%.2f"|format(total_cashouts_pending) }}</p>
+                <p><strong>Completed Payouts:</strong> GH₵{{ "%.2f"|format(total_cashouts_completed) }}</p>
+                <p><strong>Total Payouts:</strong> GH₵{{ "%.2f"|format(total_cashouts_completed +
+                    total_cashouts_pending) }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="padding: 20px;">
+                <h4>Metrics</h4>
+                <p><strong>Average Users per Level:</strong> {{ (total_referrals / total_users)|round(2) if total_users
+                    > 0 else 0 }}</p>
+                <p><strong>Verification Rate:</strong> {{ ((verified_users / total_users * 100)|round(2) if total_users
+                    > 0 else 0) }}%</p>
+                <p><strong>Average Points per User:</strong> {{ (total_earnings / total_users)|round(2) if total_users >
+                    0 else 0 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

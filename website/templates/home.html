@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content text-center">
+        <h1 class="hero-title">
+            <i class="fas fa-hand-sparkles"></i> Welcome, {{ user.first_name }}!
+        </h1>
+        <p class="hero-subtitle">
+            You're part of the Buddies Earn family. Let's grow together! 💰
+        </p>
+    </div>
+</div>
+
+<!-- Main Earnings Card -->
+<div class="card card-earnings" style="text-align: center;">
+    <div class="card-stat-value">
+        <i class="fas fa-coins"></i> GH₵{{ "%.2f"|format(user.earnings_balance or 0) }}
+    </div>
+    <div class="card-stat-label">Total Earnings</div>
+    <div style="margin-top: 1.5rem; font-size: 1.125rem;">
+        <strong>Available to Withdraw</strong>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="card card-stat">
+        <div class="card-stat-value">{{ referral_counts[1] }}</div>
+        <div class="card-stat-label">
+            <i class="fas fa-user-friends"></i> Level 1 Referrals
+        </div>
+    </div>
+
+    <div class="card card-stat">
+        <div class="card-stat-value">{{ referral_counts[2] }}</div>
+        <div class="card-stat-label">
+            <i class="fas fa-users"></i> Level 2 Referrals
+        </div>
+    </div>
+
+    <div class="card card-stat">
+        <div class="card-stat-value">{{ referral_counts[3] }}</div>
+        <div class="card-stat-label">
+            <i class="fas fa-user-group"></i> Level 3 Referrals
+        </div>
+    </div>
+</div>
+
+<!-- Referral Link Card -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-share-alt"></i> Your Referral Link
+    </div>
+    <div class="referral-link-box">
+        <p style="color: var(--gray-700); margin-bottom: 1rem;">
+            Share this code and earn rewards when people join!
+        </p>
+        <div class="referral-code">{{ referral_code }}</div>
+        <div style="margin-top: 1.5rem;">
+            <input type="text" id="referralLink"
+                value="{{ request.url_root.rstrip('/') }}{{ url_for('auth.sign_up') }}?ref={{ referral_code }}" readonly
+                style="width: 100%; padding: 0.75rem; border: 2px solid var(--gray-200); border-radius: 0.5rem; font-family: monospace; font-size: 0.875rem; margin-bottom: 1rem;" />
+            <button onclick="copyReferralLink()" class="copy-btn" id="copyBtn">
+                <i class="fas fa-copy"></i> Copy Link
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, #E3F2FD 0%, white 100%);">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
+                <i class="fas fa-sitemap"></i>
+            </div>
+            <h4>Referral Network</h4>
+            <p style="color: var(--gray-600);">View your complete referral tree and earnings breakdown</p>
+            <a href="{{ url_for('views.referrals') }}" class="btn btn-primary">
+                <i class="fas fa-chart-network"></i> View Network
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, #E8F5E9 0%, white 100%);">
+            <div style="font-size: 3rem; color: var(--accent-green); margin-bottom: 1rem;">
+                <i class="fas fa-award"></i>
+            </div>
+            <h4>Rewards Program</h4>
+            <p style="color: var(--gray-600);">Earn bonus points at each referral level</p>
+            <a href="{{ url_for('views.referrals') }}" class="btn btn-success">
+                <i class="fas fa-gift"></i> Learn More
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Earning Potential Info -->
+<div class="card"
+    style="background: linear-gradient(135deg, var(--accent-light-blue) 0%, white 100%); border: 2px solid var(--primary);">
+    <div class="card-header" style="background: transparent;">
+        <i class="fas fa-lightbulb"></i> How to Maximize Your Earnings
+    </div>
+    <div class="row">
+        <div class="col-md-4 text-center" style="padding: 1.5rem;">
+            <div
+                style="width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 1.5rem;">
+                <i class="fas fa-share-nodes"></i>
+            </div>
+            <h5>1. Share Your Link</h5>
+            <p style="color: var(--gray-600); font-size: 0.875rem;">
+                Share your unique referral link with friends and family
+            </p>
+        </div>
+        <div class="col-md-4 text-center" style="padding: 1.5rem;">
+            <div
+                style="width: 60px; height: 60px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 1.5rem;">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <h5>2. They Sign Up</h5>
+            <p style="color: var(--gray-600); font-size: 0.875rem;">
+                Earn points when they join and verify their payment
+            </p>
+        </div>
+        <div class="col-md-4 text-center" style="padding: 1.5rem;">
+            <div
+                style="width: 60px; height: 60px; background: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 1.5rem;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h5>3. Grow Network</h5>
+            <p style="color: var(--gray-600); font-size: 0.875rem;">
+                Earn from 3 levels deep as your network expands
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyReferralLink() {
+        const linkInput = document.getElementById('referralLink');
+        const copyBtn = document.getElementById('copyBtn');
+
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999); // For mobile
+
+        navigator.clipboard.writeText(linkInput.value).then(() => {
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.classList.add('copied');
+
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Payment Verification{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 20px;">
+    <h2>Admin Dashboard - Payment Verification</h2>
+
+    <div class="row" style="margin-top: 20px;">
+        <!-- Pending Payments -->
+        <div class="col-md-12">
+            <div class="card" style="padding: 15px; margin-bottom: 20px;">
+                <h4 class="text-danger">⏳ Pending Verification ({{ pending_payments|length }})</h4>
+                {% if pending_payments %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Submitted Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in pending_payments %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.payment_date.strftime('%Y-%m-%d %H:%M') if user.payment_date else 'N/A' }}</td>
+                            <td>
+                                <form method="POST" style="display: inline;">
+                                    <button formaction="{{ url_for('admin.verify_payment', user_id=user.id) }}"
+                                        class="btn btn-sm btn-success">Approve</button>
+                                    <button formaction="{{ url_for('admin.reject_payment', user_id=user.id) }}"
+                                        class="btn btn-sm btn-danger">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No pending payments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Verified Payments -->
+        <div class="col-md-6">
+            <div class="card" style="padding: 15px; margin-bottom: 20px;">
+                <h4 class="text-success">✓ Verified ({{ verified_payments|length }})</h4>
+                {% if verified_payments %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in verified_payments %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No verified payments.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Rejected Payments -->
+        <div class="col-md-6">
+            <div class="card" style="padding: 15px; margin-bottom: 20px;">
+                <h4 class="text-danger">✗ Rejected ({{ rejected_payments|length }})</h4>
+                {% if rejected_payments %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in rejected_payments %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">No rejected payments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

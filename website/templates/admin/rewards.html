@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Reward Configuration{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem 0;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: var(--text-3xl); font-weight: 700; color: var(--gray-900); margin: 0;">
+                <i class="fas fa-gift" style="color: var(--primary); margin-right: 0.5rem;"></i>Reward Configuration
+            </h1>
+            <p style="color: var(--gray-500); margin-top: 0.5rem; font-size: var(--text-sm);">
+                Manage and adjust the reward amounts in Ghana Cedis (GH₵) for each referral level
+            </p>
+        </div>
+        <div
+            style="background: var(--accent-light-blue); padding: 1rem 1.5rem; border-radius: var(--radius-lg); border-left: 4px solid var(--primary);">
+            <div style="font-size: var(--text-sm); color: var(--gray-600); margin-bottom: 0.5rem;">
+                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>System Impact
+            </div>
+            <div style="font-size: var(--text-xs); color: var(--gray-600);">
+                Changes apply to future referrals only
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Configuration Form -->
+        <div>
+            <div
+                style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: 2rem;">
+                <form method="POST">
+                    <!-- Level 1 Reward -->
+                    <div style="margin-bottom: 2rem;">
+                        <label
+                            style="display: block; font-weight: 600; color: var(--gray-900); margin-bottom: 0.75rem; font-size: var(--text-sm);">
+                            <i class="fas fa-level-up-alt" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                            Level 1 Reward (Direct Referrals)
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div
+                                style="background: var(--gray-100); padding: 0 1rem; border-radius: var(--radius-lg) 0 0 var(--radius-lg); font-weight: 600; color: var(--gray-600);">
+                                <i class="fas fa-star" style="color: var(--accent-gold);"></i>
+                            </div>
+                            <input type="number" name="level_1_amount" value="{{ reward_dict.get(1, 20) }}" step="0.01"
+                                required
+                                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-200); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; font-size: var(--text-base); transition: var(--transition-fast);"
+                                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px var(--accent-light-blue)'"
+                                onblur="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
+                        </div>
+                        <small
+                            style="display: block; margin-top: 0.5rem; color: var(--gray-500); font-size: var(--text-xs);">
+                            Ghana Cedis awarded for each direct referral
+                        </small>
+                    </div>
+
+                    <!-- Level 2 Reward -->
+                    <div style="margin-bottom: 2rem;">
+                        <label
+                            style="display: block; font-weight: 600; color: var(--gray-900); margin-bottom: 0.75rem; font-size: var(--text-sm);">
+                            <i class="fas fa-network-wired" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                            Level 2 Reward (Referrals of Referrals)
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div
+                                style="background: var(--gray-100); padding: 0 1rem; border-radius: var(--radius-lg) 0 0 var(--radius-lg); font-weight: 600; color: var(--gray-600);">
+                                <i class="fas fa-star" style="color: var(--accent-blue);"></i>
+                            </div>
+                            <input type="number" name="level_2_amount" value="{{ reward_dict.get(2, 10) }}" step="0.01"
+                                required
+                                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-200); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; font-size: var(--text-base); transition: var(--transition-fast);"
+                                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px var(--accent-light-blue)'"
+                                onblur="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
+                        </div>
+                        <small
+                            style="display: block; margin-top: 0.5rem; color: var(--gray-500); font-size: var(--text-xs);">
+                            Ghana Cedis awarded for referrals made by your direct referrals
+                        </small>
+                    </div>
+
+                    <!-- Level 3 Reward -->
+                    <div style="margin-bottom: 2rem;">
+                        <label
+                            style="display: block; font-weight: 600; color: var(--gray-900); margin-bottom: 0.75rem; font-size: var(--text-sm);">
+                            <i class="fas fa-share-nodes" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                            Level 3 Reward (Third Level Referrals)
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div
+                                style="background: var(--gray-100); padding: 0 1rem; border-radius: var(--radius-lg) 0 0 var(--radius-lg); font-weight: 600; color: var(--gray-600);">
+                                <i class="fas fa-star" style="color: var(--accent-green);"></i>
+                            </div>
+                            <input type="number" name="level_3_amount" value="{{ reward_dict.get(3, 5) }}" step="0.01"
+                                required
+                                style="flex: 1; padding: 0.75rem 1rem; border: 2px solid var(--gray-200); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; font-size: var(--text-base); transition: var(--transition-fast);"
+                                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px var(--accent-light-blue)'"
+                                onblur="this.style.borderColor='var(--gray-200)'; this.style.boxShadow='none'">
+                        </div>
+                        <small
+                            style="display: block; margin-top: 0.5rem; color: var(--gray-500); font-size: var(--text-xs);">
+                            Ghana Cedis awarded for referrals at the third level deep
+                        </small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div
+                        style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                        <button type="submit"
+                            style="flex: 1; padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-lg); font-size: var(--text-base); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                            onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                            onmouseout="this.style.background='var(--primary)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <i class="fas fa-save" style="margin-right: 0.5rem;"></i>Update Rewards
+                        </button>
+                        <a href="{{ url_for('admin.dashboard') }}"
+                            style="flex: 1; padding: 0.75rem 1.5rem; background: var(--gray-200); color: var(--gray-800); text-decoration: none; border-radius: var(--radius-lg); font-size: var(--text-base); font-weight: 600; text-align: center; transition: var(--transition-fast); cursor: pointer;"
+                            onmouseover="this.style.background='var(--gray-300)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                            onmouseout="this.style.background='var(--gray-200)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <i class="fas fa-times" style="margin-right: 0.5rem;"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Information Panel -->
+        <div>
+            <!-- Referral Structure Explanation -->
+            <div
+                style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); padding: 2rem; margin-bottom: 1.5rem;">
+                <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--gray-900); margin-bottom: 1.5rem;">
+                    <i class="fas fa-sitemap" style="color: var(--primary); margin-right: 0.5rem;"></i>Referral
+                    Structure
+                </h3>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Level 1 Explanation -->
+                    <div
+                        style="padding: 1rem; background: var(--accent-light-blue); border-radius: var(--radius-lg); border-left: 4px solid #FFD700;">
+                        <div
+                            style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem; font-size: var(--text-sm);">
+                            <i class="fas fa-level-up-alt" style="margin-right: 0.3rem;"></i>Level 1: Direct Referrals
+                        </div>
+                        <p style="margin: 0; font-size: var(--text-xs); color: var(--gray-600); line-height: 1.5;">
+                            Your direct referrals. You receive points when someone signs up using your referral link.
+                        </p>
+                    </div>
+
+                    <!-- Level 2 Explanation -->
+                    <div
+                        style="padding: 1rem; background: #E3F2FD; border-radius: var(--radius-lg); border-left: 4px solid #2196F3;">
+                        <div
+                            style="font-weight: 600; color: #1565C0; margin-bottom: 0.5rem; font-size: var(--text-sm);">
+                            <i class="fas fa-network-wired" style="margin-right: 0.3rem;"></i>Level 2: Second Level
+                        </div>
+                        <p
+                            style="margin: 0; font-size: var(--text-xs); color: #1565C0; line-height: 1.5; opacity: 0.8;">
+                            Referrals of your direct referrals. You earn points when your referrals' referrals join.
+                        </p>
+                    </div>
+
+                    <!-- Level 3 Explanation -->
+                    <div
+                        style="padding: 1rem; background: #E8F5E9; border-radius: var(--radius-lg); border-left: 4px solid #28A745;">
+                        <div
+                            style="font-weight: 600; color: #1B5E20; margin-bottom: 0.5rem; font-size: var(--text-sm);">
+                            <i class="fas fa-share-nodes" style="margin-right: 0.3rem;"></i>Level 3: Third Level
+                        </div>
+                        <p
+                            style="margin: 0; font-size: var(--text-xs); color: #1B5E20; line-height: 1.5; opacity: 0.8;">
+                            Third level deep. You earn points when your level 2 referrals' referrals join.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div
+                style="background: #FFF3E0; border-radius: var(--radius-xl); padding: 2rem; border-left: 4px solid #FF9800;">
+                <h4 style="font-size: var(--text-base); font-weight: 700; color: #E65100; margin-bottom: 1rem;">
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>Important Notes
+                </h4>
+                <ul
+                    style="margin: 0; padding-left: 1.5rem; font-size: var(--text-sm); color: #E65100; line-height: 1.8;">
+                    <li>Changes apply to <strong>future referrals only</strong></li>
+                    <li>Existing rewards will <strong>NOT</strong> be recalculated</li>
+                    <li>Minimum reward: <strong>1 point</strong></li>
+                    <li>Maximum reward: <strong>10,000 points</strong></li>
+                    <li>All changes are logged for audit purposes</li>
+                </ul>
+            </div>
+
+            <!-- Current Stats -->
+            <div
+                style="background: var(--primary); color: white; border-radius: var(--radius-xl); padding: 2rem; margin-top: 1.5rem;">
+                <h4 style="font-size: var(--text-base); font-weight: 700; margin-bottom: 1rem;">
+                    <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i>Current Configuration
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">{{ reward_dict.get(1,
+                            50) }}</div>
+                        <div style="font-size: var(--text-xs); opacity: 0.8;">Level 1</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">{{ reward_dict.get(2,
+                            30) }}</div>
+                        <div style="font-size: var(--text-xs); opacity: 0.8;">Level 2</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">{{ reward_dict.get(3,
+                            10) }}</div>
+                        <div style="font-size: var(--text-xs); opacity: 0.8;">Level 3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

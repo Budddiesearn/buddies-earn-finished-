@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Buddies Earn Arena - Your premier affiliate earning platform" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap Grid Only -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap-grid.min.css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous" />
+
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+  <title>{% block title %}Home{% endblock %} - Buddies Earn Arena</title>
+</head>
+
+<body>
+  <!-- Modern Navigation -->
+  <nav class="navbar-modern">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between">
+        <a href="/" class="navbar-brand">
+          <div class="brand-icon">BE</div>
+          <span>Buddies Earn</span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+          <a class="nav-link {% if request.endpoint == 'views.home' %}active{% endif %}" href="/">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <a class="nav-link {% if request.endpoint == 'views.referrals' %}active{% endif %}"
+            href="{{ url_for('views.referrals') }}">
+            <i class="fas fa-users"></i> Referrals
+          </a>
+          <a class="nav-link {% if request.endpoint == 'views.cashout' %}active{% endif %}"
+            href="{{ url_for('views.cashout') }}">
+            <i class="fas fa-wallet"></i> Cashout
+          </a>
+          {% if user.is_admin %}
+          <a class="nav-link {% if 'admin' in request.endpoint %}active{% endif %}"
+            href="{{ url_for('admin.dashboard') }}">
+            <i class="fas fa-shield-alt"></i> Admin
+          </a>
+          {% endif %}
+          <a class="nav-link" href="/logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+          {% else %}
+          <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" href="/login">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </a>
+          <a class="nav-link {% if request.endpoint == 'auth.sign_up' %}active{% endif %}" href="/sign-up">
+            <i class="fas fa-user-plus"></i> Sign Up
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="container" style="margin-top: 1.5rem;">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
+      <i
+        class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }}"></i>
+      {{ message }}
+      <button type="button" class="close" onclick="this.parentElement.remove()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <div class="container" style="margin-top: 2rem; margin-bottom: 3rem;">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: var(--gray-800); color: white; padding: 2rem 0; margin-top: 4rem;">
+    <div class="container text-center">
+      <p style="margin: 0; opacity: 0.8;">
+        &copy; 2026 Buddies Earn Arena. All rights reserved.
+        <span style="margin: 0 0.5rem;">|</span>
+        Your trusted affiliate platform
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+
+</html>

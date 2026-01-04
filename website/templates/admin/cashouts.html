@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Cashout Management{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem 0;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: var(--text-3xl); font-weight: 700; color: var(--gray-900); margin: 0;">
+                <i class="fas fa-money-check-alt" style="color: var(--primary); margin-right: 0.5rem;"></i>Cashout
+                Requests
+            </h1>
+            <p style="color: var(--gray-500); margin-top: 0.5rem; font-size: var(--text-sm);">
+                Manage user withdrawal requests and payment processing
+            </p>
+        </div>
+    </div>
+
+    <!-- Status Filter Cards -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        {% set status_config = {
+        'pending': {'icon': 'clock', 'color': '#FF9800', 'bg': '#FFF3E0', 'text': '#E65100'},
+        'approved': {'icon': 'check-circle', 'color': '#2196F3', 'bg': '#E3F2FD', 'text': '#1565C0'},
+        'completed': {'icon': 'check-double', 'color': '#28A745', 'bg': '#E8F5E9', 'text': '#1B5E20'},
+        'rejected': {'icon': 'times-circle', 'color': '#DC3545', 'bg': '#FFEBEE', 'text': '#B71C1C'}
+        } %}
+
+        {% for status, config in status_config.items() %}
+        <a href="{{ url_for('admin.cashouts', status=status) }}"
+            style="display: block; padding: 1.25rem; background: {{ config.bg }}; border-radius: var(--radius-lg); text-decoration: none; transition: var(--transition-base); cursor: pointer; border: 2px solid {{ 'var(--primary)' if current_status == status else 'transparent' }};"
+            onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-lg)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="font-size: 1.5rem; color: {{ config.color }}; margin-bottom: 0.5rem;">
+                <i class="fas fa-{{ config.icon }}"></i>
+            </div>
+            <div
+                style="font-weight: 600; color: {{ config.text }}; font-size: var(--text-sm); text-transform: capitalize;">
+                {{ status }}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Cashouts Table Card -->
+    <div style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); overflow: hidden;">
+        {% if cashout_requests %}
+        <!-- Table Container -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--gray-50); border-bottom: 2px solid var(--gray-200);">
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Cashout ID
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            User
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Amount
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Status
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Requested
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: center; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashout in cashout_requests %}
+                    <tr style="border-bottom: 1px solid var(--gray-200); transition: var(--transition-base); background: white;"
+                        onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
+                        <td style="padding: 1rem;">
+                            <code
+                                style="background: var(--gray-100); padding: 0.35rem 0.75rem; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: var(--text-xs); color: var(--gray-700);">#{{ cashout.id }}</code>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <a href="{{ url_for('admin.user_detail', user_id=cashout.user_id) }}"
+                                style="color: var(--primary); text-decoration: none; font-weight: 600; transition: var(--transition-fast);"
+                                onmouseover="this.style.textDecoration='underline'"
+                                onmouseout="this.style.textDecoration='none'">
+                                User #{{ cashout.user_id }}
+                            </a>
+                        </td>
+                        <td
+                            style="padding: 1rem; font-weight: 700; color: var(--accent-gold); font-size: var(--text-lg);">
+                            GH₵{{ "%.2f"|format(cashout.amount) }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if cashout.status == 'completed' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #E8F5E9; color: #1B5E20; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-check-double" style="margin-right: 0.3rem;"></i>Completed
+                            </span>
+                            {% elif cashout.status == 'approved' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #E3F2FD; color: #1565C0; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-check-circle" style="margin-right: 0.3rem;"></i>Approved
+                            </span>
+                            {% elif cashout.status == 'pending' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #FFF3E0; color: #E65100; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-clock" style="margin-right: 0.3rem;"></i>Pending
+                            </span>
+                            {% elif cashout.status == 'rejected' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #FFEBEE; color: #B71C1C; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-times-circle" style="margin-right: 0.3rem;"></i>Rejected
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem; color: var(--gray-600); font-size: var(--text-sm);">
+                            {{ cashout.requested_at.strftime('%b %d, %Y %H:%M') }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            {% if cashout.status == 'pending' %}
+                            <form method="POST" style="display: flex; gap: 0.5rem; justify-content: center;">
+                                <button formaction="{{ url_for('admin.approve_cashout', cashout_id=cashout.id) }}"
+                                    style="padding: 0.5rem 0.75rem; background: var(--accent-green); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                                    onclick="return confirm('Approve this cashout request?')"
+                                    onmouseover="this.style.background='#2a9a3a'; this.style.transform='scale(1.05)'"
+                                    onmouseout="this.style.background='var(--accent-green)'; this.style.transform='scale(1)'">
+                                    <i class="fas fa-check" style="margin-right: 0.3rem;"></i>Approve
+                                </button>
+                                <button formaction="{{ url_for('admin.reject_cashout', cashout_id=cashout.id) }}"
+                                    style="padding: 0.5rem 0.75rem; background: var(--accent-red); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                                    onclick="return confirm('Reject this cashout request?')"
+                                    onmouseover="this.style.background='#c82333'; this.style.transform='scale(1.05)'"
+                                    onmouseout="this.style.background='var(--accent-red)'; this.style.transform='scale(1)'">
+                                    <i class="fas fa-times" style="margin-right: 0.3rem;"></i>Reject
+                                </button>
+                            </form>
+                            {% elif cashout.status == 'approved' %}
+                            <form method="POST" style="display: inline;">
+                                <button formaction="{{ url_for('admin.complete_cashout', cashout_id=cashout.id) }}"
+                                    style="padding: 0.5rem 1rem; background: var(--accent-green); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600; cursor: pointer; transition: var(--transition-fast);"
+                                    onclick="return confirm('Mark this cashout as completed?')"
+                                    onmouseover="this.style.background='#2a9a3a'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)'"
+                                    onmouseout="this.style.background='var(--accent-green)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                    <i class="fas fa-check-double" style="margin-right: 0.3rem;"></i>Complete
+                                </button>
+                            </form>
+                            {% else %}
+                            <span style="color: var(--gray-400); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-lock" style="margin-right: 0.3rem;"></i>No action
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 3rem; text-align: center;">
+            <div style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <p style="color: var(--gray-500); font-size: var(--text-lg);">No {{ current_status }} cashout requests</p>
+            <p style="color: var(--gray-400); font-size: var(--text-sm);">Select a different status to view other
+                requests</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

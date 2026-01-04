@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-shield-alt"></i> Admin Panel
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="{{ url_for('admin.dashboard') }}"
+                    class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin.payment_verification') }}"
+                    class="nav-link {% if request.endpoint == 'admin.payment_verification' %}active{% endif %}">
+                    <i class="fas fa-credit-card nav-icon"></i>
+                    <span>Payment Verification</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin.users') }}"
+                    class="nav-link {% if request.endpoint == 'admin.users' or request.endpoint == 'admin.user_detail' %}active{% endif %}">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin.cashouts') }}"
+                    class="nav-link {% if request.endpoint == 'admin.cashouts' %}active{% endif %}">
+                    <i class="fas fa-money-check-alt nav-icon"></i>
+                    <span>Cashouts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin.rewards') }}"
+                    class="nav-link {% if request.endpoint == 'admin.rewards' %}active{% endif %}">
+                    <i class="fas fa-gift nav-icon"></i>
+                    <span>Rewards</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin.statistics') }}"
+                    class="nav-link {% if request.endpoint == 'admin.statistics' %}active{% endif %}">
+                    <i class="fas fa-chart-bar nav-icon"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+        </ul>
+
+        <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2);">
+            <a href="{{ url_for('views.home') }}" class="nav-link">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Back to Site</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Admin Content Area -->
+    <main class="admin-content">
+        {% block admin_content %}
+        {% endblock %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+// Notes feature has been removed; deleteNote() is no longer available.

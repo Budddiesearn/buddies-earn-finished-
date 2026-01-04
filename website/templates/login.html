@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-top: 3rem;">
+    <div class="col-md-6" style="display: flex; align-items: center; justify-content: center;">
+        <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 5rem; color: var(--primary); margin-bottom: 1.5rem;">
+                <i class="fas fa-sign-in-alt"></i>
+            </div>
+            <h2 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 1rem;">Welcome Back!</h2>
+            <p style="color: var(--gray-600); font-size: 1.125rem; max-width: 400px;">
+                Login to your Buddies Earn Arena account and continue growing your network.
+            </p>
+            <div
+                style="margin-top: 2rem; padding: 1.5rem; background: var(--accent-light-blue); border-radius: 1rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <h5 style="color: var(--primary); margin-bottom: 1rem;">
+                    <i class="fas fa-rocket"></i> Why Join Us?
+                </h5>
+                <ul style="text-align: left; color: var(--gray-700); list-style: none; padding: 0;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-check" style="color: var(--accent-green);"></i> Earn from 3-level referrals
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-check" style="color: var(--accent-green);"></i> Fast and secure payouts
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-check" style="color: var(--accent-green);"></i> Transparent earning system
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card" style="max-width: 500px; margin: 0 auto; padding: 3rem 2.5rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: var(--gray-900); font-size: 2rem;">
+                    <i class="fas fa-user-circle"></i> Sign In
+                </h3>
+                <p style="color: var(--gray-600);">Enter your credentials to access your account</p>
+            </div>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="your username"
+                        required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Enter your password" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                    <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                </button>
+            </form>
+
+            <div
+                style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--gray-100);">
+                <p style="color: var(--gray-600);">
+                    Don't have an account?
+                    <a href="/sign-up" style="color: var(--primary); font-weight: 700;">
+                        Sign Up Now <i class="fas fa-arrow-right"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

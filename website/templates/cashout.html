@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Cashout{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <!-- Page Header -->
+    <div class="text-center mb-6">
+        <h1 style="color: var(--primary);">
+            <i class="fas fa-wallet"></i> Request Cashout
+        </h1>
+        <p style="color: var(--gray-600); font-size: 1.125rem;">
+            Convert your points to cash and withdraw your earnings
+        </p>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="card"
+        style="background: linear-gradient(135deg, var(--accent-green) 0%, #20a037 100%); color: white; border: none; text-align: center;">
+        <div style="font-size: 1.125rem; opacity: 0.95; margin-bottom: 0.5rem;">
+            <i class="fas fa-coins"></i> Available Balance
+        </div>
+        <div style="font-size: 3.5rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem;">
+            GH₵{{ "%.2f"|format(available_amount) }}
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">
+            Ready to withdraw
+        </div>
+        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 0.5rem;">
+            <i class="fas fa-info-circle"></i> Minimum cashout: GH₵30.00
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Cashout Request Form -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-hand-holding-usd"></i> New Cashout Request
+                </div>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label class="form-label" for="recipient_name">
+                            <i class="fas fa-user"></i> Recipient's Name
+                        </label>
+                        <input type="text" class="form-control" id="recipient_name" name="recipient_name"
+                            placeholder="Full name of recipient" required style="font-size: 1rem;" />
+                        <small class="form-text">
+                            The name must match your bank account
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone_number">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number"
+                            placeholder="e.g., 0551234567" required style="font-size: 1rem;" />
+                        <small class="form-text">
+                            Your mobile money number for payment
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="amount">
+                            <i class="fas fa-money-bill-wave"></i> Amount to Withdraw (GH₵)
+                        </label>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="30"
+                            max="{{ available_amount }}" placeholder="0.00" required
+                            style="font-size: 1.5rem; font-weight: 700; color: var(--primary);" />
+                        <small class="form-text">
+                            Minimum: GH₵30.00 | Maximum available: GH₵{{ "%.2f"|format(available_amount) }}
+                        </small>
+                    </div>
+
+                    <div
+                        style="background: var(--accent-light-blue); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                        <h6 style="color: var(--primary); margin-bottom: 0.5rem;">
+                            <i class="fas fa-calculator"></i> Quick Amount Selector
+                        </h6>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" onclick="setAmount(30)" class="btn btn-sm btn-outline">GH₵30</button>
+                            <button type="button" onclick="setAmount(50)" class="btn btn-sm btn-outline">GH₵50</button>
+                            <button type="button" onclick="setAmount(100)"
+                                class="btn btn-sm btn-outline">GH₵100</button>
+                            <button type="button" onclick="setAmount(200)"
+                                class="btn btn-sm btn-outline">GH₵200</button>
+                            <button type="button" onclick="setAmount({{ available_amount }})"
+                                class="btn btn-sm btn-outline">Max</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block btn-lg">
+                        <i class="fas fa-paper-plane"></i> Submit Cashout Request
+                    </button>
+                </form>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: 0.5rem;">
+                    <h6 style="color: var(--gray-700); margin-bottom: 0.5rem;">
+                        <i class="fas fa-clock"></i> Processing Time
+                    </h6>
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin: 0;">
+                        Cashout requests are typically processed within 24-48 hours during business days.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Cashout History -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i> Cashout History
+                </div>
+
+                {% if cashouts %}
+                <div style="max-height: 500px; overflow-y: auto;">
+                    {% for cashout in cashouts %}
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--gray-100);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
+                                    GH₵{{ "%.2f"|format(cashout.amount) }}
+                                </div>
+                                <div style="font-size: 0.875rem; color: var(--gray-500);">
+                                    <i class="far fa-calendar"></i> {{ cashout.requested_at.strftime('%B %d, %Y') }}
+                                </div>
+                            </div>
+                            <div>
+                                {% if cashout.status == 'completed' %}
+                                <span class="badge badge-success" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-check-circle"></i> Completed
+                                </span>
+                                {% elif cashout.status == 'approved' %}
+                                <span class="badge badge-info" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-thumbs-up"></i> Approved
+                                </span>
+                                {% elif cashout.status == 'pending' %}
+                                <span class="badge badge-warning" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                                {% else %}
+                                <span class="badge badge-danger" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                                    <i class="fas fa-times-circle"></i> {{ cashout.status|title }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if cashout.status == 'pending' %}
+                        <div
+                            style="background: var(--accent-light-blue); padding: 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; color: var(--primary);">
+                            <i class="fas fa-info-circle"></i> Your request is being reviewed by our team
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 3rem 1rem; color: var(--gray-500);">
+                    <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h5 style="color: var(--gray-600);">No Cashout Requests Yet</h5>
+                    <p style="font-size: 0.875rem;">
+                        Submit your first cashout request to see it here
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{{ url_for('views.home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script>
+    const maxAmountValue = {{ available_amount | tojson }};
+
+    function setAmount(amount) {
+        const maxAmount = maxAmountValue;
+        const finalAmount = Math.min(amount, maxAmount);
+        document.getElementById('amount').value = finalAmount.toFixed(2);
+    }
+</script>
+
+{% endblock %}

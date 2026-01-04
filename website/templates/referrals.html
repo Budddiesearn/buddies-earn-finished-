@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Network{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="text-center mb-6">
+    <h1 style="color: var(--primary);">
+        <i class="fas fa-sitemap"></i> Your Referral Network
+    </h1>
+    <p style="color: var(--gray-600); font-size: 1.125rem;">
+        Track and manage your growing affiliate network
+    </p>
+</div>
+
+<!-- Referral Link Card -->
+<div class="card"
+    style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none;">
+    <div class="d-flex justify-content-between align-items-center" style="flex-wrap: wrap; gap: 1rem;">
+        <div style="flex: 1; min-width: 250px;">
+            <h4 style="color: white; margin-bottom: 0.5rem;">
+                <i class="fas fa-link"></i> Your Referral Code
+            </h4>
+            <div
+                style="background: rgba(255,255,255,0.2); padding: 0.75rem 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">
+                {{ referral_code }}
+            </div>
+            <p style="opacity: 0.9; margin: 0; font-size: 0.875rem;">Share this code to earn rewards!</p>
+        </div>
+        <div style="flex: 1; min-width: 250px;">
+            <h4 style="color: white; margin-bottom: 0.5rem;">
+                <i class="fas fa-coins"></i> Total Earnings
+            </h4>
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-gold);">
+                {{ user.points_balance or 0 }}
+            </div>
+            <p style="opacity: 0.9; margin: 0; font-size: 0.875rem;">Points (≈ GH₵{{ "%.2f"|format((user.points_balance
+                or 0) * 0.01) }})</p>
+        </div>
+    </div>
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+        <input type="text" id="referralLink"
+            value="{{ request.url_root.rstrip('/') }}{{ url_for('auth.sign_up') }}?ref={{ referral_code }}" readonly
+            style="width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; font-family: monospace; font-size: 0.875rem; margin-bottom: 0.75rem;" />
+        <button onclick="copyReferralLink()" class="btn" style="background: white; color: var(--primary);" id="copyBtn">
+            <i class="fas fa-copy"></i> Copy Referral Link
+        </button>
+    </div>
+</div>
+
+<!-- Network Stats -->
+<div class="stats-grid">
+    <div class="card"
+        style="background: linear-gradient(135deg, #E3F2FD 0%, white 100%); border-left: 4px solid var(--primary); text-align: center;">
+        <div class="level-badge" style="background: var(--primary); display: inline-block; margin-bottom: 1rem;">LEVEL 1
+        </div>
+        <div style="font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+            {{ counts[1] }}
+        </div>
+        <p style="color: var(--gray-600); margin: 0; font-weight: 600;">Direct Referrals</p>
+    </div>
+
+    <div class="card"
+        style="background: linear-gradient(135deg, #E1F5FE 0%, white 100%); border-left: 4px solid var(--accent-blue); text-align: center;">
+        <div class="level-badge" style="background: var(--accent-blue); display: inline-block; margin-bottom: 1rem;">
+            LEVEL 2</div>
+        <div style="font-size: 3rem; font-weight: 800; color: var(--accent-blue); margin-bottom: 0.5rem;">
+            {{ counts[2] }}
+        </div>
+        <p style="color: var(--gray-600); margin: 0; font-weight: 600;">Secondary Referrals</p>
+    </div>
+
+    <div class="card"
+        style="background: linear-gradient(135deg, #E8F5E9 0%, white 100%); border-left: 4px solid var(--accent-green); text-align: center;">
+        <div class="level-badge" style="background: var(--accent-green); display: inline-block; margin-bottom: 1rem;">
+            LEVEL 3</div>
+        <div style="font-size: 3rem; font-weight: 800; color: var(--accent-green); margin-bottom: 0.5rem;">
+            {{ counts[3] }}
+        </div>
+        <p style="color: var(--gray-600); margin: 0; font-weight: 600;">Tertiary Referrals</p>
+    </div>
+</div>
+
+<!-- Referral Tree Visual -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-project-diagram"></i> Network Hierarchy
+    </div>
+    <div class="referral-tree">
+        <!-- Level 1 -->
+        <div class="tree-level tree-level-1">
+            <div class="tree-level-header">
+                <span class="level-badge" style="background: var(--primary);">LEVEL 1</span>
+                <span>Direct Referrals ({{ counts[1] }})</span>
+            </div>
+            {% if direct %}
+            <div class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>User ID</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in direct %}
+                    <tr>
+                        <td><strong>{{ u.first_name }} {{ u.last_name or '' }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td><span class="badge badge-primary">{{ u.id }}</span></td>
+                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+            {% else %}
+            <p style="color: var(--gray-500); padding: 1rem; background: var(--gray-50); border-radius: 0.5rem;">
+                <i class="fas fa-info-circle"></i> No direct referrals yet. Share your link to start building your
+                network!
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Level 2 -->
+        <div class="tree-level tree-level-2">
+            <div class="tree-level-header">
+                <span class="level-badge" style="background: var(--accent-blue);">LEVEL 2</span>
+                <span>Secondary Referrals ({{ counts[2] }})</span>
+            </div>
+            {% if level2 %}
+            <div class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>User ID</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in level2 %}
+                    <tr>
+                        <td><strong>{{ u.first_name }} {{ u.last_name or '' }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td><span class="badge badge-info">{{ u.id }}</span></td>
+                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+            {% else %}
+            <p style="color: var(--gray-500); padding: 1rem; background: var(--gray-50); border-radius: 0.5rem;">
+                <i class="fas fa-info-circle"></i> No level 2 referrals yet. Encourage your referrals to share!
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Level 3 -->
+        <div class="tree-level tree-level-3">
+            <div class="tree-level-header">
+                <span class="level-badge" style="background: var(--accent-green);">LEVEL 3</span>
+                <span>Tertiary Referrals ({{ counts[3] }})</span>
+            </div>
+            {% if level3 %}
+            <div class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>User ID</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in level3 %}
+                    <tr>
+                        <td><strong>{{ u.first_name }} {{ u.last_name or '' }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td><span class="badge badge-success">{{ u.id }}</span></td>
+                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+            {% else %}
+            <p style="color: var(--gray-500); padding: 1rem; background: var(--gray-50); border-radius: 0.5rem;">
+                <i class="fas fa-info-circle"></i> No level 3 referrals yet. Keep growing your network!
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Earnings Ledger -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-chart-line"></i> Earnings History
+    </div>
+    {% if ledger %}
+    <div class="table-modern">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>From User</th>
+                <th>Level</th>
+                <th>Points</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in ledger %}
+            <tr>
+                <td>{{ e.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td><span class="badge badge-primary">User #{{ e.from_user_id }}</span></td>
+                <td>
+                    <span
+                        class="badge badge-{{ 'primary' if e.level == 1 else 'info' if e.level == 2 else 'success' }}">
+                        Level {{ e.level }}
+                    </span>
+                </td>
+                <td><strong style="color: var(--accent-green);">+{{ e.points }}</strong></td>
+                <td>{{ e.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </div>
+    {% else %}
+    <p
+        style="color: var(--gray-500); padding: 2rem; text-align: center; background: var(--gray-50); border-radius: 0.5rem;">
+        <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
+        No earnings yet. Start referring to see your earnings history here!
+    </p>
+    {% endif %}
+</div>
+
+<script>
+    function copyReferralLink() {
+        const linkInput = document.getElementById('referralLink');
+        const copyBtn = document.getElementById('copyBtn');
+
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(linkInput.value).then(() => {
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.style.background = 'var(--accent-green)';
+            copyBtn.style.color = 'white';
+
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Referral Link';
+                copyBtn.style.background = 'white';
+                copyBtn.style.color = 'var(--primary)';
+            }, 2000);
+        });
+    }
+</script>
+
+{% endblock %}

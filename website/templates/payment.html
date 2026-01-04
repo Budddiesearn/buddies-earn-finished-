@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Required{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <div class="card" style="padding: 30px;">
+        <h2 class="text-center">Complete Your Payment</h2>
+        <p class="text-center">Welcome, {{ user.first_name }}! To access your dashboard and start earning through
+            referrals, please complete your payment.</p>
+
+        <hr>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <h3>Payment Amount: GH₵50.00</h3>
+            <p class="text-muted">One-time activation fee</p>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>Payment Instructions:</strong>
+            <ol style="margin-top: 10px;">
+                <li>Transfer the amount to the account details below</li>
+                <li>After payment, click "Confirm Payment" button</li>
+                <li>Your account will be activated immediately</li>
+            </ol>
+        </div>
+
+        <div class="card" style="padding: 15px; background-color: #f8f9fa; margin: 20px 0;">
+            <h5>Bank Account Details</h5>
+            <p><strong>Bank Name:</strong> GCB BANK</p>
+            <p><strong>Account Name:</strong> AMPONSAH MELCHIZEDEK NANA</p>
+            <p><strong>Account Number:</strong> 1011101583540</p>
+            <p><strong>Reference:</strong> Enter Your username as reference</p>
+        </div>
+
+        <form method="POST" style="margin-top: 20px;">
+            <div class="form-check" style="margin-bottom: 20px;">
+                <input class="form-check-input" type="checkbox" id="payment_confirmed" name="payment_confirmed"
+                    value="yes" required>
+                <label class="form-check-label" for="payment_confirmed">
+                    I confirm that I have completed the payment
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">Confirm Payment & Continue</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('auth.logout') }}" class="text-muted">Logout</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

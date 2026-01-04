@@ -1,0 +1,220 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<!-- Dashboard Header -->
+<div style="margin-bottom: 2rem;">
+    <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+    </h1>
+    <p style="color: var(--gray-600); font-size: 1.125rem;">
+        Monitor and manage your platform at a glance
+    </p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="card"
+        style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-users"></i>
+        </div>
+        <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">
+            {{ total_users }}
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Total Users</div>
+    </div>
+
+    <div class="card"
+        style="background: linear-gradient(135deg, var(--accent-green) 0%, #20a037 100%); color: white; border: none; text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">
+            {{ total_verified }}
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Verified Payments</div>
+    </div>
+
+    <div class="card"
+        style="background: linear-gradient(135deg, var(--accent-gold) 0%, #e6c200 100%); color: white; border: none; text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">
+            GH₵{{ "%.2f"|format(total_payouts) }}
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Total Payouts</div>
+    </div>
+
+    <div class="card"
+        style="background: linear-gradient(135deg, var(--accent-red) 0%, #c82333 100%); color: white; border: none; text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-ban"></i>
+        </div>
+        <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">
+            {{ total_suspended + total_banned }}
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;">Suspended/Banned</div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="row">
+    <div class="col-md-6">
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bolt"></i> Quick Actions
+            </div>
+            <div style="display: grid; gap: 1rem;">
+                <a href="{{ url_for('admin.payment_verification') }}" class="btn"
+                    style="background: #FF9800; color: white; justify-content: flex-start;">
+                    <i class="fas fa-credit-card"></i> Verify Payments
+                </a>
+                <a href="{{ url_for('admin.users') }}" class="btn btn-primary" style="justify-content: flex-start;">
+                    <i class="fas fa-users"></i> Manage Users
+                </a>
+                <a href="{{ url_for('admin.cashouts') }}" class="btn btn-success" style="justify-content: flex-start;">
+                    <i class="fas fa-hand-holding-usd"></i> Process Cashouts
+                </a>
+                <a href="{{ url_for('admin.rewards') }}" class="btn"
+                    style="background: var(--accent-gold); color: white; justify-content: flex-start;">
+                    <i class="fas fa-gift"></i> Configure Rewards
+                </a>
+                <a href="{{ url_for('admin.statistics') }}" class="btn btn-info" style="justify-content: flex-start;">
+                    <i class="fas fa-chart-line"></i> View Analytics
+                </a>
+            </div>
+        </div>
+
+        <!-- Reward Configuration -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cog"></i> Current Reward Configuration
+            </div>
+            <div class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Referral Level</th>
+                        <th>Points Reward</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for level in [1, 2, 3] %}
+                    <tr>
+                        <td>
+                            <span
+                                class="badge badge-{{ 'primary' if level == 1 else 'info' if level == 2 else 'success' }}">
+                                Level {{ level }}
+                            </span>
+                        </td>
+                        <td><strong style="color: var(--accent-green);">{{ reward_dict.get(level, 0) }} points</strong>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+            <div style="margin-top: 1rem;">
+                <a href="{{ url_for('admin.rewards') }}" class="btn btn-sm btn-outline">
+                    <i class="fas fa-edit"></i> Edit Rewards
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Pending Cashouts -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clock"></i> Pending Cashouts
+                <span class="badge badge-warning" style="float: right;">{{ pending_cashouts|length }}</span>
+            </div>
+
+            {% if pending_cashouts %}
+            <div class="table-modern">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashout in pending_cashouts[:5] %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('admin.user_detail', user_id=cashout.user_id) }}"
+                                style="font-weight: 600;">
+                                User #{{ cashout.user_id }}
+                            </a>
+                        </td>
+                        <td><strong style="color: var(--primary);">GH₵{{ "%.2f"|format(cashout.amount) }}</strong></td>
+                        <td>{{ cashout.requested_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+
+            {% if pending_cashouts|length > 5 %}
+            <div
+                style="padding: 1rem; background: var(--gray-50); border-radius: 0.5rem; margin-top: 1rem; text-align: center;">
+                <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem;">
+                    And {{ pending_cashouts|length - 5 }} more pending requests
+                </p>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 1rem;">
+                <a href="{{ url_for('admin.cashouts') }}" class="btn btn-primary btn-block">
+                    <i class="fas fa-list"></i> View All Cashouts
+                </a>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--gray-500);">
+                <div style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h5 style="color: var(--gray-600);">All Clear!</h5>
+                <p style="font-size: 0.875rem;">No pending cashout requests at the moment</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- System Overview -->
+<div class="card" style="background: var(--accent-light-blue); border: 2px solid var(--primary);">
+    <div class="card-header" style="background: transparent; border-bottom: 2px solid var(--primary);">
+        <i class="fas fa-info-circle"></i> Platform Overview
+    </div>
+    <div class="row">
+        <div class="col-md-3 text-center" style="padding: 2rem 1rem; border-right: 1px solid var(--gray-200);">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">
+                {{ total_users }}
+            </div>
+            <p style="color: var(--gray-700); margin: 0; font-weight: 600;">Registered Users</p>
+        </div>
+        <div class="col-md-3 text-center" style="padding: 2rem 1rem; border-right: 1px solid var(--gray-200);">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-green);">
+                {{ total_verified }}
+            </div>
+            <p style="color: var(--gray-700); margin: 0; font-weight: 600;">Verified Accounts</p>
+        </div>
+        <div class="col-md-3 text-center" style="padding: 2rem 1rem; border-right: 1px solid var(--gray-200);">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-gold);">
+                {{ "%.0f"|format((total_verified / total_users * 100) if total_users > 0 else 0) }}%
+            </div>
+            <p style="color: var(--gray-700); margin: 0; font-weight: 600;">Verification Rate</p>
+        </div>
+        <div class="col-md-3 text-center" style="padding: 2rem 1rem;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-red);">
+                {{ total_suspended + total_banned }}
+            </div>
+            <p style="color: var(--gray-700); margin: 0; font-weight: 600;">Action Required</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

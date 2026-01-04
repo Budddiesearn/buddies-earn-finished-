@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Users Management{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem 0;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: var(--text-3xl); font-weight: 700; color: var(--gray-900); margin: 0;">
+                <i class="fas fa-users" style="color: var(--primary); margin-right: 0.5rem;"></i>Users Management
+            </h1>
+            <p style="color: var(--gray-500); margin-top: 0.5rem; font-size: var(--text-sm);">
+                Manage platform users, verify payments, and monitor account status
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div
+                style="background: var(--primary); color: white; padding: 1rem 1.5rem; border-radius: var(--radius-lg); text-align: center;">
+                <div style="font-size: var(--text-sm); opacity: 0.8;">Total Users</div>
+                <div style="font-size: var(--text-2xl); font-weight: 700;">{{ users.total }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table Card -->
+    <div style="background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); overflow: hidden;">
+        {% if users.items %}
+        <!-- Table Container -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--gray-50); border-bottom: 2px solid var(--gray-200);">
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            User
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Email
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Payment Status
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Account Status
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Referral Code
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Points
+                        </th>
+                        <th
+                            style="padding: 1rem; text-align: center; font-weight: 600; color: var(--gray-700); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.5px;">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users.items %}
+                    <tr style="border-bottom: 1px solid var(--gray-200); transition: var(--transition-base); background: white;"
+                        onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
+                        <td style="padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div
+                                    style="width: 40px; height: 40px; background: var(--accent-light-blue); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--primary);">
+                                    {{ user.first_name[0].upper() if user.first_name else 'U' }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-900);">{{ user.first_name }}</div>
+                                    <div style="font-size: var(--text-xs); color: var(--gray-500);">ID: #{{ user.id }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem; color: var(--gray-600); font-size: var(--text-sm);">
+                            {{ user.email }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if user.payment_status == 'verified' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #D4EDDA; color: #155724; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-check-circle" style="margin-right: 0.3rem;"></i>Verified
+                            </span>
+                            {% elif user.payment_status == 'pending' %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #FFF3CD; color: #856404; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-clock" style="margin-right: 0.3rem;"></i>Pending
+                            </span>
+                            {% else %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #F8D7DA; color: #721C24; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-times-circle" style="margin-right: 0.3rem;"></i>Unverified
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if user.is_banned %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #F8D7DA; color: #721C24; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-ban" style="margin-right: 0.3rem;"></i>Banned
+                            </span>
+                            {% elif user.is_suspended %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #FFF3CD; color: #856404; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-pause-circle" style="margin-right: 0.3rem;"></i>Suspended
+                            </span>
+                            {% else %}
+                            <span
+                                style="display: inline-block; padding: 0.35rem 0.75rem; background: #D4EDDA; color: #155724; border-radius: var(--radius-md); font-size: var(--text-xs); font-weight: 600;">
+                                <i class="fas fa-check-circle" style="margin-right: 0.3rem;"></i>Active
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem;">
+                            <code
+                                style="background: var(--gray-100); padding: 0.35rem 0.75rem; border-radius: var(--radius-md); font-family: 'Courier New', monospace; font-size: var(--text-xs); color: var(--gray-700);">{{ user.referral_code }}</code>
+                        </td>
+                        <td style="padding: 1rem; text-align: right; color: var(--gray-900); font-weight: 600;">
+                            {{ user.points_balance }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}"
+                                style="display: inline-block; padding: 0.5rem 1rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600; transition: var(--transition-fast); cursor: pointer;"
+                                onmouseover="this.style.background='var(--primary-dark)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                                onmouseout="this.style.background='var(--primary)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                <i class="fas fa-eye" style="margin-right: 0.3rem;"></i>View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+            style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 1.5rem; border-top: 1px solid var(--gray-200);">
+            {% if users.has_prev %}
+            <a href="{{ url_for('admin.users', page=users.prev_num) }}"
+                style="padding: 0.5rem 1rem; background: var(--gray-100); color: var(--gray-700); text-decoration: none; border-radius: var(--radius-md); font-size: var(--text-sm); transition: var(--transition-fast);"
+                onmouseover="this.style.background='var(--primary)'; this.style.color='white'"
+                onmouseout="this.style.background='var(--gray-100)'; this.style.color='var(--gray-700)'">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+            {% endif %}
+
+            {% for page_num in users.iter_pages() %}
+            {% if page_num %}
+            {% if page_num == users.page %}
+            <button
+                style="padding: 0.5rem 0.75rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-md); font-size: var(--text-sm); font-weight: 600; cursor: pointer;">
+                {{ page_num }}
+            </button>
+            {% else %}
+            <a href="{{ url_for('admin.users', page=page_num) }}"
+                style="padding: 0.5rem 0.75rem; background: var(--gray-100); color: var(--gray-700); text-decoration: none; border-radius: var(--radius-md); font-size: var(--text-sm); transition: var(--transition-fast); cursor: pointer;"
+                onmouseover="this.style.background='var(--primary)'; this.style.color='white'"
+                onmouseout="this.style.background='var(--gray-100)'; this.style.color='var(--gray-700)'">
+                {{ page_num }}
+            </a>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            {% if users.has_next %}
+            <a href="{{ url_for('admin.users', page=users.next_num) }}"
+                style="padding: 0.5rem 1rem; background: var(--gray-100); color: var(--gray-700); text-decoration: none; border-radius: var(--radius-md); font-size: var(--text-sm); transition: var(--transition-fast);"
+                onmouseover="this.style.background='var(--primary)'; this.style.color='white'"
+                onmouseout="this.style.background='var(--gray-100)'; this.style.color='var(--gray-700)'">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="padding: 3rem; text-align: center;">
+            <div style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;">
+                <i class="fas fa-users"></i>
+            </div>
+            <p style="color: var(--gray-500); font-size: var(--text-lg);">No users found</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

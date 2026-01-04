@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-top: 3rem;">
+    <div class="col-md-6" style="display: flex; align-items: center; justify-content: center;">
+        <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 5rem; color: var(--primary); margin-bottom: 1.5rem;">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 1rem;">Join The Money Team!</h2>
+            <p style="color: var(--gray-600); font-size: 1.125rem; max-width: 400px; margin: 0 auto;">
+                Start your journey to financial freedom. Build your network and earn passive income.
+            </p>
+            <div
+                style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 1rem; max-width: 400px; margin-left: auto; margin-right: auto; color: white;">
+                <h5 style="color: white; margin-bottom: 1rem;">
+                    <i class="fas fa-gift"></i> What You Get
+                </h5>
+                <ul style="text-align: left; list-style: none; padding: 0;">
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-star" style="color: var(--accent-gold);"></i> 3-Level earning system
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-star" style="color: var(--accent-gold);"></i> Unlimited earning potential
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-star" style="color: var(--accent-gold);"></i> Instant commission tracking
+                    </li>
+                    <li style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-star" style="color: var(--accent-gold);"></i> Easy cashout system
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card" style="max-width: 550px; margin: 0 auto; padding: 3rem 2.5rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: var(--gray-900); font-size: 2rem;">
+                    <i class="fas fa-rocket"></i> Create Account
+                </h3>
+                <p style="color: var(--gray-600);">Fill in the details to get started</p>
+            </div>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com"
+                        required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="e.g., John5"
+                        required />
+                    <small class="form-text">Must start with capital letter, end with number, min 5 chars</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="mobile">
+                        <i class="fas fa-mobile-alt"></i> Mobile Number
+                    </label>
+                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="+233123456789"
+                        required />
+                    <small class="form-text">Ghana mobile number starting with +233</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="referral">
+                        <i class="fas fa-gift"></i> Referral Code (Optional)
+                    </label>
+                    <input type="text" class="form-control" id="referral" name="referral"
+                        placeholder="Enter referral code" value="{{ referral or '' }}" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password1">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" class="form-control" id="password1" name="password1"
+                        placeholder="Create a strong password" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password2">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <input type="password" class="form-control" id="password2" name="password2"
+                        placeholder="Re-enter your password" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                    <i class="fas fa-user-plus"></i> Create My Account
+                </button>
+            </form>
+
+            <div
+                style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--gray-100);">
+                <p style="color: var(--gray-600);">
+                    Already have an account?
+                    <a href="/login" style="color: var(--primary); font-weight: 700;">
+                        Login Here <i class="fas fa-arrow-right"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
