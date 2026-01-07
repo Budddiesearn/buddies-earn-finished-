@@ -26,23 +26,9 @@ development - leave empty, for production Render will set this){% block title %}
             <p class="text-muted">One-time activation fee</p>
         </div>
 
-        <div class="alert alert-info">
-            <strong>Payment Instructions:</strong>
-            <ol style="margin-top: 10px;">
-                <li>Transfer the amount to the account details below</li>
-                <li>After payment, click "Confirm Payment" button</li>
-                <li>Your account will be activated immediately</li>
-            </ol>
-        </div>
 
-        <div class="card" style="padding: 15px; background-color: #f8f9fa; margin: 20px 0;">
-            <h5>Mobile Money Payment Details</h5>
-            <p><strong>Network:</strong> MTN Mobile Money</p>
-            <p><strong>Name:</strong> John Ogoe</p>
-            <p><strong>Mobile Money Number:</strong> 0536809688</p>
-            <p><strong>Reference:</strong> <span style="color: #dc3545; font-weight: bold;">IMPORTANT - Use your
-                    username as reference during payment</span></p>
-        </div>
+
+
 
         <!-- Automated Payment Section -->
         <div class="card"
@@ -82,6 +68,10 @@ development - leave empty, for production Render will set this){% block title %}
             <h5 style="color: var(--gray-600);">Manual Payment</h5>
             <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 10px;">
                 If automated payment doesn't work, you can pay manually to: <strong>0536809688 (John Ogoe)</strong>
+            </p>
+            <p style="margin-top: -5px;">
+                <strong>Reference:</strong> <span style="color: #dc3545; font-weight: bold;">IMPORTANT - Use your
+                    username as reference during payment</span>
             </p>
             <form method="POST" style="margin-top: 15px;">
                 <div class="form-check" style="margin-bottom: 15px;">
