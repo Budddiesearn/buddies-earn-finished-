@@ -1,12 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import jsonify
 from flask_login import login_required, current_user
 from .models import Referral, ReferralEarning, CashoutRequest
 from . import db
 from sqlalchemy.sql import func
-import requests
-import os
-import json
 from .email_utils import send_activation_email
 
 views = Blueprint('views', __name__)
@@ -101,121 +98,6 @@ def payment():
             flash('Payment was not confirmed. Please try again.', category='error')
 
     return render_template('payment.html', user=current_user)
-
-
-@views.route('/initialize-payment', methods=['POST'])
-@login_required
-def initialize_payment():
-    """Initialize Paystack mobile money payment."""
-    try:
-        data = request.get_json()
-        mobile_number = data.get('mobile_number')
-
-        if not mobile_number:
-            return jsonify({'success': False, 'message': 'Mobile number is required'}), 400
-
-        # Paystack API configuration
-        paystack_secret_key = os.environ.get('PAYSTACK_SECRET_KEY', '')
-
-        if not paystack_secret_key:
-            # Fallback to manual verification if no API key
-            return jsonify({
-                'success': False,
-                'message': 'Paystack not configured. Please use manual payment method.',
-                'fallback': True
-            }), 400
-
-        # Initialize transaction
-        url = "https://api.paystack.co/transaction/initialize"
-        headers = {
-            "Authorization": f"Bearer {paystack_secret_key}",
-            "Content-Type": "application/json"
-        }
-
-        payload = {
-            "email": current_user.email,
-            "amount": 5000,  # 50 GHS in pesewas (50 * 100)
-            "currency": "GHS",
-            "mobile_money": {
-                "phone": mobile_number,
-                "provider": "mtn"  # MTN Mobile Money
-            },
-            "metadata": {
-                "user_id": current_user.id,
-                "username": current_user.username,
-                "purpose": "account_activation"
-            },
-            "callback_url": url_for('views.verify_payment', _external=True)
-        }
-
-        response = requests.post(url, headers=headers, json=payload)
-        result = response.json()
-
-        if result.get('status'):
-            return jsonify({
-                'success': True,
-                'authorization_url': result['data']['authorization_url'],
-                'access_code': result['data']['access_code'],
-                'reference': result['data']['reference']
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': result.get('message', 'Payment initialization failed')
-            }), 400
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@views.route('/verify-payment', methods=['GET'])
-@login_required
-def verify_payment():
-    """Verify Paystack payment after completion."""
-    reference = request.args.get('reference')
-
-    if not reference:
-        flash('Invalid payment reference', category='error')
-        return redirect(url_for('views.payment'))
-
-    try:
-        paystack_secret_key = os.environ.get('PAYSTACK_SECRET_KEY', '')
-
-        if not paystack_secret_key:
-            flash('Payment verification unavailable', category='error')
-            return redirect(url_for('views.payment'))
-
-        # Verify transaction
-        url = f"https://api.paystack.co/transaction/verify/{reference}"
-        headers = {
-            "Authorization": f"Bearer {paystack_secret_key}"
-        }
-
-        response = requests.get(url, headers=headers)
-        result = response.json()
-
-        if result.get('status') and result['data']['status'] == 'success':
-            # Update user payment status
-            current_user.payment_status = 'verified'
-            current_user.payment_date = func.now()
-            db.session.commit()
-
-            # Send activation email (best-effort)
-            if not send_activation_email(current_user):
-                flash('Payment successful! (Email not configured)',
-                      category='success')
-            else:
-                flash('Payment successful! Welcome email sent.',
-                      category='success')
-            return redirect(url_for('views.home'))
-        else:
-            flash(
-                'Payment verification failed. Please try again or contact support.', category='error')
-            return redirect(url_for('views.payment'))
-
-    except Exception as e:
-        flash(f'Error verifying payment: {str(e)}', category='error')
-        return redirect(url_for('views.payment'))
 
 
 @views.route('/payment-pending', methods=['GET'])
