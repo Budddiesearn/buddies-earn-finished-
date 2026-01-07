@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Payment Required{% endblock %}
+
+
+
+
+
+
+
+
+PAYSTACK_PUBLIC_KEY=pk_test_your_paystack_public_key_herePAYSTACK_SECRET_KEY=sk_test_your_paystack_secret_key_here#
+Paystack Configuration (Get from https://dashboard.paystack.com/#/settings/developers)DATABASE_URL=# Database (for local
+development - leave empty, for production Render will set this){% block title %}Payment Required{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 600px; margin-top: 50px;">
@@ -34,29 +44,57 @@
                     username as reference during payment</span></p>
         </div>
 
-        <div class="alert alert-warning"
-            style="background-color: #fff3cd; border-left: 4px solid #ffc107; margin: 20px 0;">
-            <h5 style="color: #856404; margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Payment Method Update
-            </h5>
-            <p style="color: #856404; margin-bottom: 0;">
-                We have changed our payment method from <strong>Bank Push</strong> to <strong>Mobile Money
-                    Payment</strong>.
-                This change was made based on user feedback indicating that mobile money payments are more familiar and
-                easier to use than bank push transfers.
+        <!-- Automated Payment Section -->
+        <div class="card"
+            style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 20px 0; border: none;">
+            <h5 style="color: white; margin-bottom: 15px;"><i class="fas fa-bolt"></i> Quick Payment (Recommended)</h5>
+            <p style="color: #f0f0f0; margin-bottom: 15px; font-size: 0.95rem;">
+                Pay instantly with your mobile money. You'll receive a prompt on your phone to authorize the payment.
             </p>
-        </div>
 
-        <form method="POST" style="margin-top: 20px;">
-            <div class="form-check" style="margin-bottom: 20px;">
-                <input class="form-check-input" type="checkbox" id="payment_confirmed" name="payment_confirmed"
-                    value="yes" required>
-                <label class="form-check-label" for="payment_confirmed">
-                    I confirm that I have completed the payment
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <label for="mobile_number" style="color: white; font-weight: 600; margin-bottom: 8px; display: block;">
+                    Enter Your Mobile Money Number
                 </label>
+                <input type="tel" id="mobile_number" class="form-control" placeholder="e.g., 0244123456"
+                    style="margin-bottom: 10px; padding: 12px; font-size: 16px;" pattern="[0-9]{10}" maxlength="10">
+                <small style="color: #f0f0f0; font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i> Enter the number that will receive the payment prompt
+                </small>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block btn-lg">Confirm Payment & Continue</button>
-        </form>
+            <button id="payNowBtn" class="btn btn-light btn-lg btn-block"
+                style="font-weight: 700; padding: 15px; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                <i class="fas fa-mobile-alt"></i> PAY NOW - GH₵50.00
+            </button>
+
+            <div id="paymentStatus" style="margin-top: 15px; display: none;">
+                <div class="alert" style="margin: 0;"></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <p style="color: var(--gray-600); font-size: 0.9rem;">OR</p>
+        </div>
+
+        <!-- Manual Payment Section -->
+        <div class="card" style="padding: 15px; background-color: #f8f9fa; margin: 20px 0; border: 2px dashed #ccc;">
+            <h5 style="color: var(--gray-600);">Manual Payment</h5>
+            <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 10px;">
+                If automated payment doesn't work, you can pay manually to: <strong>0536809688 (John Ogoe)</strong>
+            </p>
+            <form method="POST" style="margin-top: 15px;">
+                <div class="form-check" style="margin-bottom: 15px;">
+                    <input class="form-check-input" type="checkbox" id="payment_confirmed" name="payment_confirmed"
+                        value="yes" required>
+                    <label class="form-check-label" for="payment_confirmed">
+                        I have completed manual payment and want admin verification
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block">Submit for Manual Verification</button>
+            </form>
+        </div>
+
 
         <div style="text-align: center; margin-top: 20px;">
             <a href="https://wa.me/233536809688" target="_blank" class="btn"
@@ -70,4 +108,78 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('payNowBtn').addEventListener('click', async function () {
+        const mobileNumber = document.getElementById('mobile_number').value;
+        const btn = this;
+        const statusDiv = document.getElementById('paymentStatus');
+        const statusAlert = statusDiv.querySelector('.alert');
+
+        // Validate mobile number
+        if (!mobileNumber || mobileNumber.length !== 10) {
+            statusDiv.style.display = 'block';
+            statusAlert.className = 'alert alert-danger';
+            statusAlert.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a valid 10-digit mobile number';
+            return;
+        }
+
+        // Disable button and show loading
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        statusDiv.style.display = 'none';
+
+        try {
+            const response = await fetch('{{ url_for("views.initialize_payment") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mobile_number: mobileNumber
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Show success message
+                statusDiv.style.display = 'block';
+                statusAlert.className = 'alert alert-success';
+                statusAlert.innerHTML = '<i class="fas fa-check-circle"></i> <strong>Check your phone!</strong><br>You should receive a prompt to authorize the payment. Please approve it to complete your activation.';
+
+                // Redirect to authorization URL (Paystack payment page)
+                setTimeout(() => {
+                    window.location.href = data.authorization_url;
+                }, 2000);
+            } else {
+                // Check if fallback to manual payment
+                if (data.fallback) {
+                    statusDiv.style.display = 'block';
+                    statusAlert.className = 'alert alert-warning';
+                    statusAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.message + '<br>Please use the manual payment option below.';
+                } else {
+                    statusDiv.style.display = 'block';
+                    statusAlert.className = 'alert alert-danger';
+                    statusAlert.innerHTML = '<i class="fas fa-times-circle"></i> ' + data.message;
+                }
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-mobile-alt"></i> PAY NOW - GH₵50.00';
+            }
+        } catch (error) {
+            statusDiv.style.display = 'block';
+            statusAlert.className = 'alert alert-danger';
+            statusAlert.innerHTML = '<i class="fas fa-exclamation-circle"></i> Network error. Please try again or use manual payment.';
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-mobile-alt"></i> PAY NOW - GH₵50.00';
+        }
+    });
+
+    // Format phone number as user types
+    document.getElementById('mobile_number').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
 {% endblock %}
