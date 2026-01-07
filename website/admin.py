@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from .models import User, CashoutRequest, RewardConfig, ReferralEarning
 from .auth import award_referral_rewards
+from .email_utils import send_activation_email
 from . import db
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
@@ -263,6 +264,9 @@ def verify_payment(user_id):
 
     # Award referral rewards now that the user is verified
     award_referral_rewards(user)
+
+    # Send activation email (best-effort)
+    send_activation_email(user)
 
     flash(
         f'Payment verified for {user.first_name}. They now have dashboard access.', category='success')

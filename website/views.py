@@ -7,6 +7,7 @@ from sqlalchemy.sql import func
 import requests
 import os
 import json
+from .email_utils import send_activation_email
 
 views = Blueprint('views', __name__)
 
@@ -199,8 +200,13 @@ def verify_payment():
             current_user.payment_date = func.now()
             db.session.commit()
 
-            flash('Payment successful! Your account has been activated.',
-                  category='success')
+            # Send activation email (best-effort)
+            if not send_activation_email(current_user):
+                flash('Payment successful! (Email not configured)',
+                      category='success')
+            else:
+                flash('Payment successful! Welcome email sent.',
+                      category='success')
             return redirect(url_for('views.home'))
         else:
             flash(
