@@ -14,6 +14,11 @@ def create_app(config_overrides=None):
     # Base configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'BUDDIES EARN')
 
+    # Disable template caching in debug mode
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.jinja_env.auto_reload = True
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
     # Use PostgreSQL in production, SQLite in development
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
